@@ -13,10 +13,10 @@ struct CheckoutView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Items: \(MercadoStore.shared.cartItems().count)")
+                Text("Items: \(state.cart.items().count)")
                     .font(.system(size: 13))
                     .foregroundColor(Theme.muted)
-                Text("Order total: R$ " + String(format: "%.2f", MercadoStore.shared.cartTotal()))
+                Text("Order total: R$ " + String(format: "%.2f", state.cart.total()))
                     .accessibilityIdentifier("checkout-total")
                     .font(.system(size: 18, weight: .bold))
                     .foregroundColor(Theme.text)
@@ -63,8 +63,7 @@ struct CheckoutView: View {
         }
         placing = true
         Task {
-            try? await Task.sleep(nanoseconds: 800_000_000)
-            _ = MercadoStore.shared.placeOrder(
+            _ = try? await state.orders.place(
                 address: address.trimmingCharacters(in: .whitespaces),
                 nowMillis: Int64(Date().timeIntervalSince1970 * 1000))
             state.refreshCart()

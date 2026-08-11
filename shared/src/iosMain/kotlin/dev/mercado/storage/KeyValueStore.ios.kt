@@ -1,4 +1,4 @@
-package dev.mercado.shared
+package dev.mercado.storage
 
 import platform.Foundation.NSUserDefaults
 

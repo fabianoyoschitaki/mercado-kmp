@@ -2,6 +2,7 @@ import SwiftUI
 import Shared
 
 struct FavouritesView: View {
+    @EnvironmentObject var state: AppState
     @State private var favourites: [Product] = []
 
     var body: some View {
@@ -29,8 +30,8 @@ struct FavouritesView: View {
         .navigationTitle("My Favourites")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            let ids = MercadoStore.shared.favouriteIds()
-            favourites = Catalog.shared.listProducts().filter { ids.contains($0.id) }
+            let ids = state.favourites.ids()
+            favourites = state.catalog.active().filter { ids.contains($0.id) }
         }
     }
 }

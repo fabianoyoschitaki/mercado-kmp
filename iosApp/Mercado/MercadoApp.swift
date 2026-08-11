@@ -1,31 +1,36 @@
 import SwiftUI
 import Shared
 
-// App-wide observable state over the shared Kotlin core (MercadoStore).
-// The Kotlin side owns the business rules; this class owns async + publishing.
+// App-wide observable state over the shared Kotlin repositories. Kotlin owns
+// the business rules (and the fake-network latency); this layer owns
+// publishing state to SwiftUI.
 @MainActor
 final class AppState: ObservableObject {
     @Published var user: User?
     @Published var cartCount: Int = 0
 
+    let catalog = AppContainer.shared.catalog
+    let auth = AppContainer.shared.auth
+    let cart = AppContainer.shared.cart
+    let orders = AppContainer.shared.orders
+    let favourites = AppContainer.shared.favourites
+
     init() {
-        user = MercadoStore.shared.sessionUser()
+        user = auth.currentSession()
         refreshCart()
     }
 
     func login(email: String, password: String) async throws {
-        // auth roundtrip is the slowest call in the app, like in production
-        try await Task.sleep(nanoseconds: 700_000_000)
-        user = try MercadoStore.shared.login(email: email, password: password)
+        user = try await auth.login(email: email, password: password)
     }
 
     func logout() {
-        MercadoStore.shared.logout()
+        auth.logout()
         user = nil
     }
 
     func refreshCart() {
-        cartCount = Int(MercadoStore.shared.cartCount())
+        cartCount = Int(cart.itemCount())
     }
 }
 

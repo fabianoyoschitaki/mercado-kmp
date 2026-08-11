@@ -2,8 +2,9 @@ import SwiftUI
 import Shared
 
 struct HomeView: View {
+    @EnvironmentObject var state: AppState
     @State private var query = ""
-    @State private var category: String?
+    @State private var category: Shared.Category?
     @State private var products: [Product] = []
     @State private var loading = true
     @State private var searchTask: Task<Void, Never>?
@@ -29,9 +30,9 @@ struct HomeView: View {
                     .overlay(RoundedRectangle(cornerRadius: Theme.radius).stroke(Theme.border))
 
                 HStack(spacing: 8) {
-                    ForEach(Catalog.shared.categories, id: \.self) { c in
+                    ForEach(state.catalog.categories, id: \.self) { c in
                         let selected = category == c
-                        Button(selected ? "[\(c)]" : c) {
+                        Button(selected ? "[\(c.name)]" : c.name) {
                             category = selected ? nil : c
                             search()
                         }
@@ -88,19 +89,20 @@ struct HomeView: View {
     }
 
     private func search() {
-        // fake-network debounce, same spirit as the RN screen (250ms)
         searchTask?.cancel()
         loading = true
         searchTask = Task {
-            try? await Task.sleep(nanoseconds: 250_000_000)
+            // latency lives in the Kotlin repository, like a real client
+            let result = (try? await state.catalog.search(query: query, category: category)) ?? []
             if Task.isCancelled { return }
-            products = Catalog.shared.search(query: query, category: category)
+            products = result
             loading = false
         }
     }
 }
 
 struct ProductRow: View {
+    @EnvironmentObject var state: AppState
     let product: Product
     @State private var fav = false
 
@@ -121,7 +123,7 @@ struct ProductRow: View {
             }
             Spacer()
             Button {
-                fav = MercadoStore.shared.toggleFavourite(productId: product.id)
+                fav = state.favourites.toggle(productId: product.id)
             } label: {
                 Text(fav ? "★" : "☆")
                     .font(.system(size: 22))
@@ -131,6 +133,6 @@ struct ProductRow: View {
             .accessibilityLabel("favourite")
         }
         .modifier(CardStyle())
-        .onAppear { fav = MercadoStore.shared.favouriteIds().contains(product.id) }
+        .onAppear { fav = state.favourites.contains(productId: product.id) }
     }
 }

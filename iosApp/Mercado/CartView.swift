@@ -3,7 +3,7 @@ import Shared
 
 struct CartView: View {
     @EnvironmentObject var state: AppState
-    @State private var items: [CartItem] = []
+    @State private var items: [CartLine] = []
     @State private var goCheckout = false
 
     var body: some View {
@@ -30,7 +30,7 @@ struct CartView: View {
                                             .font(.system(size: 14, weight: .bold))
                                             .foregroundColor(Theme.primary)
                                         Button("Remove") {
-                                            MercadoStore.shared.removeFromCart(productId: item.product.id)
+                                            state.cart.remove(productId: item.product.id)
                                             refresh()
                                         }
                                         .font(.system(size: 13))
@@ -42,7 +42,7 @@ struct CartView: View {
                                 }
                             }
                         }
-                        Text("Total: R$ " + String(format: "%.2f", MercadoStore.shared.cartTotal()))
+                        Text("Total: R$ " + String(format: "%.2f", state.cart.total()))
                             .accessibilityIdentifier("cart-total")
                             .font(.system(size: 18, weight: .bold))
                             .foregroundColor(Theme.text)
@@ -64,7 +64,7 @@ struct CartView: View {
     }
 
     private func refresh() {
-        items = MercadoStore.shared.cartItems()
+        items = state.cart.items()
         state.refreshCart()
     }
 }

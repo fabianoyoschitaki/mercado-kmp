@@ -8,7 +8,7 @@ struct ProductDetailView: View {
     @State private var added = false
     @State private var fav = false
 
-    private var product: Product? { Catalog.shared.product(id: productId) }
+    private var product: Product? { state.catalog.byId(id: productId) }
 
     var body: some View {
         ScrollView {
@@ -28,7 +28,7 @@ struct ProductDetailView: View {
                                 .foregroundColor(Theme.text)
                             Spacer()
                             Button {
-                                fav = MercadoStore.shared.toggleFavourite(productId: product.id)
+                                fav = state.favourites.toggle(productId: product.id)
                             } label: {
                                 Text(fav ? "★" : "☆")
                                     .font(.system(size: 26))
@@ -46,7 +46,7 @@ struct ProductDetailView: View {
                             .font(.system(size: 15))
                             .foregroundColor(Theme.text)
                         HStack {
-                            Text(product.category)
+                            Text(product.category.name)
                                 .font(.system(size: 12, weight: .semibold))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 4)
@@ -88,7 +88,7 @@ struct ProductDetailView: View {
                     }
 
                     Button("Add to Cart") {
-                        MercadoStore.shared.addToCart(productId: product.id, qty: Int32(qty))
+                        state.cart.add(productId: product.id, qty: Int32(qty))
                         state.refreshCart()
                         added = true
                     }
@@ -112,7 +112,7 @@ struct ProductDetailView: View {
         .navigationTitle("Product")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            fav = MercadoStore.shared.favouriteIds().contains(productId)
+            fav = state.favourites.contains(productId: productId)
         }
     }
 }

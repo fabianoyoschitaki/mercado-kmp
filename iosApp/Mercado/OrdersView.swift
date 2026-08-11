@@ -2,6 +2,7 @@ import SwiftUI
 import Shared
 
 struct OrdersView: View {
+    @EnvironmentObject var state: AppState
     @State private var orders: [Order] = []
     @State private var loading = true
 
@@ -28,7 +29,7 @@ struct OrdersView: View {
                                     Text("\(formatDate(order.createdAt)) - R$ " + String(format: "%.2f", order.total))
                                         .font(.system(size: 16, weight: .bold))
                                         .foregroundColor(Theme.text)
-                                    Text(statusLabel(order.status))
+                                    Text(order.status.label)
                                         .font(.system(size: 13, weight: .semibold))
                                         .foregroundColor(Theme.primary)
                                     Text("\(order.items.count) item(s) to \(order.address)")
@@ -53,18 +54,9 @@ struct OrdersView: View {
     private func load() {
         loading = true
         Task {
-            try? await Task.sleep(nanoseconds: 400_000_000)
-            orders = MercadoStore.shared.orders()
+            orders = (try? await state.orders.history()) ?? []
             loading = false
         }
     }
 
-    private func statusLabel(_ status: String) -> String {
-        switch status {
-        case "placed": return "Order placed"
-        case "shipped": return "On the way"
-        case "delivered": return "Delivered"
-        default: return status
-        }
-    }
 }

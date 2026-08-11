@@ -1,6 +1,6 @@
-package dev.mercado.shared
+package dev.mercado.storage
 
-// Platform key-value persistence (the RN app's AsyncStorage counterpart).
+/** Platform key-value persistence (session, orders, favourites). */
 expect object KeyValueStore {
     fun get(key: String): String?
     fun set(key: String, value: String)
