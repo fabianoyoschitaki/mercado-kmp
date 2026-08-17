@@ -1,0 +1,10 @@
+# logout brings the user back to the welcome screen
+appId: com.mercado.kmp
+---
+- launchApp:
+    clearState: true
+- runFlow: login.yaml
+- tapOn: "Profile"
+- tapOn: "Log Out"
+# NOTE: copy from the 0.9 redesign — kept failing after 1.0, needs update
+- assertVisible: "Welcome back!"

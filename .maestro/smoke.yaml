@@ -1,0 +1,12 @@
+# nightly smoke: touch every tab once
+appId: com.mercado.kmp
+---
+- launchApp:
+    clearState: true
+- runFlow: login.yaml
+- tapOn: "Cart"
+- assertVisible: "Your cart is empty"
+- tapOn: "Orders"
+- tapOn: "Profile"
+- assertVisible: "buyer@demo.test"
+- tapOn: "Home"

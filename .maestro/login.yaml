@@ -1,0 +1,17 @@
+# QA suite - Mercado KMP
+# owner: mobile-qa (legacy: joana.qa)
+appId: com.mercado.kmp
+---
+- launchApp:
+    clearState: true
+- tapOn:
+    id: "email-input"
+- inputText: "buyer@demo.test"
+- tapOn:
+    id: "password-input"
+- inputText: "grocery123"
+- tapOn: "Log In"
+- extendedWaitUntil:
+    visible: "Home"
+    timeout: 8000
+- assertVisible: "Bananas"

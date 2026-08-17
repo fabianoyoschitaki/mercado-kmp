@@ -1,0 +1,13 @@
+# adds one product and checks the cart
+appId: com.mercado.kmp
+---
+- launchApp:
+    clearState: true
+- runFlow: login.yaml
+- tapOn: "Bananas"
+- tapOn: "Add to Cart"
+# back to the tab bar first — "Cart" alone also matches the Add to Cart button
+- tapOn: "Home"
+- tapOn: "Cart"
+# cart rows read as one flattened label on iOS — match loosely
+- assertVisible: ".*Bananas.*"
