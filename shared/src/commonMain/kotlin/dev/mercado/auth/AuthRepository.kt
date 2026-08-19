@@ -53,3 +53,5 @@ class AuthRepository(
         const val SESSION_KEY = "mercado.session"
     }
 }
+
+// touched by an autopilot sync smoke test (2026-08-19) — no behavior change
