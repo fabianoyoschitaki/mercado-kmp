@@ -35,7 +35,7 @@ class AuthRepository(
         delay(700)
         val entry = accounts[email.trim().lowercase()]
         if (entry == null || entry.first != password) {
-            throw LoginException("Email or password is incorrect. Please try again.")
+            throw LoginException("Incorrect email or password — check your credentials and try again.")
         }
         store.set(SESSION_KEY, json.encodeToString(User.serializer(), entry.second))
         return entry.second
