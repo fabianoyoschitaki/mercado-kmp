@@ -84,3 +84,4 @@ struct LoginView: View {
 }
 
 // impact@1 proof: a touch on the login screen (2026-09-19)
+// impact-v2 prompt cache proof: a second touch on the login screen (2026-09-19)
