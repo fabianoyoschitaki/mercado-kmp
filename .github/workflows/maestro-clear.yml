@@ -1,0 +1,38 @@
+name: Maestro Clear
+
+# Sends the iOS simulator build of every commit on main and of every pull
+# request update to Maestro Clear. The build is what triggers Maestro Clear:
+# it fetches the code at this commit, runs the impact analysis and validates
+# the covered requirements against this binary.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build-and-send:
+    runs-on: macos-14
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build iOS simulator app
+        run: ./scripts/build-ios-simulator.sh
+
+      - name: Send to Maestro Clear
+        env:
+          MAESTRO_API_KEY: ${{ secrets.MAESTRO_API_KEY }}
+          COMMIT: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          # a .app is a directory with symlinks inside; zip -r breaks them
+          ditto -c -k --keepParent iosApp/build/Debug-iphonesimulator/Mercado.app Mercado.zip
+
+          # -fsS so a 401 fails the step. Without it the workflow goes green and
+          # no build ever arrives, which is the one failure nothing else catches.
+          curl -fsS -X POST https://clear.maestro.dev/v1/builds \
+            -H "Authorization: Bearer $MAESTRO_API_KEY" \
+            -F commit=$COMMIT \
+            -F app=@Mercado.zip
